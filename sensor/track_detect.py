@@ -60,10 +60,9 @@ while True:
     timestamp = datetime.datetime.now()
     found = False
 
-    frame = imutils.resize(frame, width=400)
+    frame = imutils.resize(frame, width=500)
     # grab the frame dimensions and convert it to a blob
     (h, w) = frame.shape[:2]
-    frame = imutils.resize(frame, width=500)
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (21, 21), 0)
@@ -86,12 +85,14 @@ while True:
         if cv2.contourArea(c) < conf["min_area"]:
             continue
 
-        # compute the bounding box for the contour, draw it on the frame, and update the text
+        img = imutils.resize(frame, width=224, height=224)
         img = np.expand_dims(img, axis=0)
         img = preprocess_input(img)
         y = net.predict(img)
+
         if np.argmax(y) == 1:
             found = True
+            # compute the bounding box for the contour, draw it on the frame, and update the text
             (x, y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 

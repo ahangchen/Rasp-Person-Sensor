@@ -16,7 +16,7 @@ import cv2
 import uuid
 import os
 
-from keras.applications.mobilenet import preprocess_input
+from keras.applications.mobilenet import preprocess_input, relu6, DepthwiseConv2D
 from keras.models import load_model
 
 
@@ -48,7 +48,7 @@ lastUploaded = datetime.datetime.now()
 motionCounter = 0
 found = False
 
-net = load_model('mbp.h5')
+net = load_model('mbp.h5', custom_objects={'relu6': relu6, 'DepthwiseConv2D': DepthwiseConv2D})
 
 # loop over the frames from the video stream
 while True:

@@ -16,7 +16,7 @@ import cv2
 import uuid
 import os
 
-from keras.applications.mobilenet import preprocess_input, relu6, DepthwiseConv2D
+from keras.applications.mobilenet import relu6, DepthwiseConv2D
 from keras.models import load_model
 
 
@@ -31,6 +31,13 @@ class TempImage:
         os.remove(self.path)
 
 
+def preprocess_input(x):
+    x /= 255.
+    x -= 0.5
+    x *= 2
+    return x
+
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--conf", required=True, help="json config file path")
@@ -40,7 +47,10 @@ conf = json.load(open(args["conf"]))
 
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
-time.sleep(conf["camera_warmup_time"])
+# time.sleep(conf["camera_warmup_time"])
+
+print("loading mobilenet model")
+net = load_model('mbp.h5', custom_objects={'relu6': relu6, 'DepthwiseConv2D': DepthwiseConv2D})
 fps = FPS().start()
 
 avg = None
@@ -48,7 +58,6 @@ lastUploaded = datetime.datetime.now()
 motionCounter = 0
 found = False
 
-net = load_model('mbp.h5', custom_objects={'relu6': relu6, 'DepthwiseConv2D': DepthwiseConv2D})
 
 # loop over the frames from the video stream
 while True:
@@ -85,8 +94,8 @@ while True:
         if cv2.contourArea(c) < conf["min_area"]:
             continue
 
-        img = imutils.resize(frame, width=224, height=224)
-        img = np.expand_dims(img, axis=0)
+        img = cv2.resize(frame, (224, 224))
+        img = np.expand_dims(img, axis=0).astype(np.float32)
         img = preprocess_input(img)
         y = net.predict(img)
 

@@ -49,8 +49,17 @@ print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
 # time.sleep(conf["camera_warmup_time"])
 
-print("loading mobilenet model")
-net = load_model('mbp.h5', custom_objects={'relu6': relu6, 'DepthwiseConv2D': DepthwiseConv2D})
+# initialize the list of class labels MobileNet SSD was trained to
+# detect, then generate a set of bounding box colors for each class
+CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
+	"bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+	"dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+	"sofa", "train", "tvmonitor"]
+COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
+# load our serialized model from disk
+print("[INFO] loading model...")
+net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+
 fps = FPS().start()
 
 avg = None
@@ -94,16 +103,20 @@ while True:
         if cv2.contourArea(c) < conf["min_area"]:
             continue
 
-        img = cv2.resize(frame, (224, 224))
-        img = np.expand_dims(img, axis=0).astype(np.float32)
-        img = preprocess_input(img)
-        y = net.predict(img)
-
-        if np.argmax(y) == 1:
-            found = True
-            # compute the bounding box for the contour, draw it on the frame, and update the text
-            (x, y, w, h) = cv2.boundingRect(c)
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
+                                     0.007843, (300, 300), 127.5)
+        net.setInput(blob)
+        detections = net.forward()
+        for i in np.arange(0, detections.shape[2]):
+            confidence = detections[0, 0, i, 2]
+            idx = int(detections[0, 0, i, 1])
+            if confidence > args["confidence"] and idx == 15:
+                print CLASSES[idx]
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+                cv2.rectangle(frame, (startX, startY), (endX, endY),
+                              COLORS[idx], 2)
+                found = True
 
     if found:
         if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:

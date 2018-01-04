@@ -16,8 +16,6 @@ import cv2
 import uuid
 import os
 
-from keras.applications.mobilenet import relu6, DepthwiseConv2D
-from keras.models import load_model
 
 
 class TempImage:
@@ -58,7 +56,7 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 # load our serialized model from disk
 print("[INFO] loading model...")
-net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+net = cv2.dnn.readNetFromCaffe(conf["prototxt"], conf["model"])
 
 fps = FPS().start()
 
@@ -110,7 +108,7 @@ while True:
         for i in np.arange(0, detections.shape[2]):
             confidence = detections[0, 0, i, 2]
             idx = int(detections[0, 0, i, 1])
-            if confidence > args["confidence"] and idx == 15:
+            if confidence > conf["confidence"] and idx == 15:
                 print CLASSES[idx]
                 box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")

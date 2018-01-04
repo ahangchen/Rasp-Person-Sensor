@@ -8,5 +8,8 @@
 	"delta_thresh": 5,
 	"resolution": [640, 480],
 	"fps": 16,
-	"min_area": 5000
+	"min_area": 5000,
+	"prototxt": "MobileNetSSD_deploy.prototxt.txt",
+	"model": "MobileNetSSD_deploy.caffemodel",
+	"confidence": 0.2
 }

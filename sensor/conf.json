@@ -1,6 +1,7 @@
 {
 	"show_video": true,
-	"upload": false,
+	"upload": true,
+	"sensorId": 1,
 	"img_upload_url": "YOUR_DROPBOX_KEY",
 	"min_upload_seconds": 3.0,
 	"min_motion_frames": 8,

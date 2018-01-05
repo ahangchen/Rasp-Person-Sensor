@@ -7,7 +7,8 @@ def upload_file(upload_url, file_path):
     files = {'file': open(file_path, 'rb')}
     response = requests.post(upload_url, files=files)
     ret = response.content.decode('utf-8')
-    ret_json = json.dumps(ret)
+    ret_json = json.loads(ret)
+    print ret_json
     return ret_json['data']
 
 

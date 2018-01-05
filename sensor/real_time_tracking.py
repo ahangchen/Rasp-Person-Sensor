@@ -13,20 +13,8 @@ import imutils
 import time
 
 import cv2
-import uuid
-import os
 
-
-
-class TempImage:
-    def __init__(self, basePath="./", ext=".jpg"):
-        # construct the file path
-        self.path = "{base_path}/{rand}{ext}".format(base_path=basePath,
-                                                     rand=str(uuid.uuid4()), ext=ext)
-
-    def cleanup(self):
-        # remove the file
-        os.remove(self.path)
+from backend.sensor import upload_detection_info
 
 
 def preprocess_input(x):
@@ -96,12 +84,15 @@ while True:
     cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
     # loop over the contours
+    boxes = []
     for c in cnts:
         # if the contour is too small, ignore it
         if cv2.contourArea(c) < conf["min_area"]:
             continue
         found = True
-        (x, y, w, h) = cv2.boundingRect(c)
+        box = cv2.boundingRect(c)
+        (x, y, w, h) = box
+        boxes.append(box)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         # blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
@@ -127,14 +118,7 @@ while True:
             # check to see if the number of frames with consistent motion is high enough
             if motionCounter >= conf["min_motion_frames"]:
                 if conf["upload"]:
-                    t = TempImage()
-                    cv2.imwrite(t.path, frame)
-
-                    # upload the image to server and cleanup the tempory image
-                    print("upload {}".format(timestamp))
-                    img_upload_url = conf["img_upload_url"]
-                    # post image
-                    t.cleanup()
+                    upload_detection_info(frame, boxes)
                 # update the last uploaded time stamp and reset the motion counter
                 lastUploaded = timestamp
                 motionCounter = 0

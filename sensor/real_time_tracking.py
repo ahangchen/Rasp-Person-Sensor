@@ -24,6 +24,20 @@ def preprocess_input(x):
     return x
 
 
+def background_accumulate(gray, avg, boxes):
+    if len(boxes) == 0:
+        cv2.accumulateWeighted(gray, avg, 0.5)
+    else:
+        bg_mask = np.ones([224, 224], dtype=np.float16) * 0.5
+        fg_mask = bg_mask.copy()
+        for box in boxes:
+            x, y, w, h = box
+            bg_mask[x: x + w, y : y + h] = 1
+            fg_mask[x: x + w, y : y + h] = 0
+        avg = avg * bg_mask + gray * fg_mask
+    return avg
+
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--conf", required=True, help="json config file path")
@@ -53,7 +67,6 @@ lastUploaded = datetime.datetime.now()
 motionCounter = 0
 found = False
 
-
 # loop over the frames from the video stream
 while True:
     # grab the frame from the threaded video stream and resize it
@@ -73,9 +86,9 @@ while True:
 
     if avg is None:
         print("[INFO] starting background model ...")
-        avg = gray.copy().astype("float")
+        avg = gray.copy().astype(np.float16)
         continue
-    cv2.accumulateWeighted(gray, avg, 0.5)
+    # cv2.accumulateWeighted(gray, avg, 0.5)
     frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(avg))
 
     thresh = cv2.threshold(frameDelta, conf["delta_thresh"], 255, cv2.THRESH_BINARY)[1]
@@ -109,6 +122,10 @@ while True:
         #         cv2.rectangle(frame, (startX, startY), (endX, endY),
         #                       COLORS[idx], 2)
         #         found = True
+
+    # cv2.accumulateWeighted(gray, avg, 0.5)
+
+    avg = background_accumulate(gray, avg, boxes)
 
     if found:
         if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:

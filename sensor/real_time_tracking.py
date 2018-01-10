@@ -26,15 +26,17 @@ def preprocess_input(x):
 
 def background_accumulate(gray, avg, boxes):
     if len(boxes) == 0:
+        print 'no moving, update bg'
         cv2.accumulateWeighted(gray, avg, 0.5)
     else:
-        bg_mask = np.ones([224, 224], dtype=np.float16) * 0.5
-        fg_mask = bg_mask.copy()
-        for box in boxes:
-            x, y, w, h = box
-            bg_mask[x: x + w, y : y + h] = 1
-            fg_mask[x: x + w, y : y + h] = 0
-        avg = avg * bg_mask + gray * fg_mask
+        print 'detect'
+        # bg_mask = np.ones(avg.shape, dtype=np.float32) * 0.5
+        # fg_mask = bg_mask.copy()
+        # for box in boxes:
+        #     x, y, w, h = box
+        #     bg_mask[x: x + w, y : y + h] = 1. 
+        #     fg_mask[x: x + w, y : y + h] = 0.
+        # avg = avg * bg_mask + gray * fg_mask
     return avg
 
 
@@ -86,7 +88,7 @@ while True:
 
     if avg is None:
         print("[INFO] starting background model ...")
-        avg = gray.copy().astype(np.float16)
+        avg = gray.copy().astype("float")
         continue
     # cv2.accumulateWeighted(gray, avg, 0.5)
     frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(avg))
@@ -145,6 +147,7 @@ while True:
     if conf["show_video"]:
         # show the output frame
         cv2.imshow("Frame", frame)
+        cv2.imshow("bg", avg/255.)
         key = cv2.waitKey(1) & 0xFF
 
         # if the `q` key was pressed, break from the loop

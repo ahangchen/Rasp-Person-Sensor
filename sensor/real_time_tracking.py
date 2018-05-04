@@ -128,6 +128,7 @@ while True:
     # cv2.accumulateWeighted(gray, avg, 0.5)
 
     avg = background_accumulate(gray, avg, boxes)
+    cv2.accumulateWeighted(gray, avg, 0.001)
 
     if found:
         if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:

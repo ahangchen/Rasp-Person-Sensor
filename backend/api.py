@@ -13,6 +13,7 @@ def singleton(cls, *args, **kw):
 class ApiConfig(object):
     host = 'http://222.201.137.47:12346'
     urls = {
+        'upload_wifi_info': host + '/sensor/wifi',
         'upload_detect_info': host + '/sensor/visionMac',
         'upload_img': host + '/file/img',
     }

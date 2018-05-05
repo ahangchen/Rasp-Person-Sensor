@@ -1,4 +1,5 @@
 import requests
+from sensor import upload_wifi_info
 
 
 def img_upload():
@@ -8,7 +9,8 @@ def img_upload():
     print(response.content.decode('utf-8'))
 
 
-
+def wifi_upload():
+    upload_wifi_info('aa:bb:cc:dd:ee:ff', 10, 1)
 
 if __name__ == '__main__':
-    img_upload()
+    wifi_upload()

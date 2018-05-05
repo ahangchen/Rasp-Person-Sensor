@@ -5,7 +5,7 @@ import uuid
 import datetime
 
 from backend.api import ApiConfig
-from backend.util import upload_file, post_json
+from backend.util import upload_file, post_json, post_form
 
 
 class TempImage:
@@ -20,20 +20,31 @@ class TempImage:
 
 
 
-def upload_detection_info(frame, boxes):
+def upload_detection_info(frame, boxes, sensorId):
     t = TempImage()
     cv2.imwrite(t.path, frame)
     svr_conf = ApiConfig()
     img_url = upload_file(svr_conf.urls['upload_img'], t.path)
     detect_json = {
         "captureTime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "fromSensorId": 1,
+        "fromSensorId": sensorId,
         "imgPath": img_url,
         "boxes": []
     }
     for box in boxes:
         detect_json["boxes"].append(box)
 
-    post_json(svr_conf.urls['upload_detect_info'], detect_json)
+    print post_json(svr_conf.urls['upload_detect_info'], detect_json)
     # post image
     t.cleanup()
+
+
+def upload_wifi_info(mac, rssi, sensorId):
+    svr_conf = ApiConfig()
+    wifi_json = {
+        "captureTime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "fromSensorId": sensorId,
+        "macAddress": mac,
+        "intensity": rssi 
+    }
+    print post_form(svr_conf.urls['upload_wifi_info'], wifi_json)

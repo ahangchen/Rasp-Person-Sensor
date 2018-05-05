@@ -16,3 +16,10 @@ def post_json(post_url, post_data):
     headers = {'content-type': 'application/json'}
     response = requests.post(post_url, data=json.dumps(post_data), headers=headers)
     return response.content.decode('utf-8')
+
+
+def post_form(post_url, post_data):
+    headers = {'content-type': 'x-www-form-urlencoded'}
+    response = requests.post(post_url, params=post_data, headers=headers)
+    return response.content.decode('utf-8')
+

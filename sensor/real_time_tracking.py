@@ -30,13 +30,13 @@ def background_accumulate(gray, avg, boxes):
         cv2.accumulateWeighted(gray, avg, 0.5)
     else:
         print 'detect'
-        # bg_mask = np.ones(avg.shape, dtype=np.float32) * 0.5
-        # fg_mask = bg_mask.copy()
-        # for box in boxes:
-        #     x, y, w, h = box
-        #     bg_mask[x: x + w, y : y + h] = 1. 
-        #     fg_mask[x: x + w, y : y + h] = 0.
-        # avg = avg * bg_mask + gray * fg_mask
+        bg_mask = np.ones(avg.shape, dtype=np.float32) * 0.5
+        fg_mask = bg_mask.copy()
+        for box in boxes:
+            x, y, w, h = box
+            bg_mask[x: x + w, y : y + h] = 1. 
+            fg_mask[x: x + w, y : y + h] = 0.
+        avg = avg * bg_mask + gray * fg_mask
     return avg
 
 
@@ -128,7 +128,7 @@ while True:
     # cv2.accumulateWeighted(gray, avg, 0.5)
 
     avg = background_accumulate(gray, avg, boxes)
-    cv2.accumulateWeighted(gray, avg, 0.001)
+    # cv2.accumulateWeighted(gray, avg, 0.5)
 
     if found:
         if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:

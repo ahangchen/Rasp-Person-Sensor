@@ -137,7 +137,7 @@ while True:
             # check to see if the number of frames with consistent motion is high enough
             if motionCounter >= conf["min_motion_frames"]:
                 if conf["upload"]:
-                    upload_detection_info(frame, boxes, int(conf['sensorId']))
+                    upload_detection_info(frame, boxes, conf['sensorId'])
                 # update the last uploaded time stamp and reset the motion counter
                 lastUploaded = timestamp
                 motionCounter = 0

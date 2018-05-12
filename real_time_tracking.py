@@ -27,16 +27,16 @@ def preprocess_input(x):
 def background_accumulate(gray, avg, boxes):
     if len(boxes) == 0:
         print 'no moving, update bg'
-        cv2.accumulateWeighted(gray, avg, 0.5)
+        cv2.accumulateWeighted(gray, avg, 0.01)
     else:
         print 'detect'
-        bg_mask = np.ones(avg.shape, dtype=np.float32) * 0.5
-        fg_mask = bg_mask.copy()
-        for box in boxes:
-            x, y, w, h = box
-            bg_mask[x: x + w, y : y + h] = 1. 
-            fg_mask[x: x + w, y : y + h] = 0.
-        avg = avg * bg_mask + gray * fg_mask
+        # bg_mask = np.ones(avg.shape, dtype=np.float32) * 0.5
+        # fg_mask = bg_mask.copy()
+        # for box in boxes:
+        #     x, y, w, h = box
+        #     bg_mask[x: x + w, y : y + h] = 1. 
+        #     fg_mask[x: x + w, y : y + h] = 0.
+        # avg = avg * bg_mask + gray * fg_mask
     return avg
 
 

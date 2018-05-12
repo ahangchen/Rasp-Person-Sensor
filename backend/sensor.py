@@ -2,7 +2,7 @@ import os
 import cv2
 import uuid
 
-import datetime
+import time, datetime
 
 from backend.api import ApiConfig
 from backend.util import upload_file, post_json, post_form
@@ -39,12 +39,13 @@ def upload_detection_info(frame, boxes, sensorId):
     t.cleanup()
 
 
-def upload_wifi_info(mac, rssi, sensorId):
+def upload_wifi_info(mac, rssi, sensorId, time_stamp):
     svr_conf = ApiConfig()
     wifi_json = {
-        "captureTime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "captureTime": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time_stamp)),
         "fromSensorId": sensorId,
         "macAddress": mac,
-        "intensity": rssi 
+        "intensity": rssi
     }
-    print post_form(svr_conf.urls['upload_wifi_info'], wifi_json)
+    print(wifi_json)
+    print(post_form(svr_conf.urls['upload_wifi_info'], wifi_json))

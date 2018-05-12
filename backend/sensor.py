@@ -2,7 +2,7 @@ import os
 import cv2
 import uuid
 
-import time
+import time, datetime
 
 from backend.api import ApiConfig
 from backend.util import upload_file, post_json, post_form
@@ -47,4 +47,5 @@ def upload_wifi_info(mac, rssi, sensorId, time_stamp):
         "macAddress": mac,
         "intensity": rssi
     }
-    print post_form(svr_conf.urls['upload_wifi_info'], wifi_json)
+    print(wifi_json)
+    print(post_form(svr_conf.urls['upload_wifi_info'], wifi_json))

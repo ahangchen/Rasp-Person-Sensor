@@ -14,15 +14,19 @@ def monitorDevice(pkt):
         addr = pkt.getlayer(Dot11).addr2
         target = pkt.getlayer(Dot11ProbeReq).info or ''
         time_stamp = pkt.getlayer(Dot11ProbeReq).time
-    if pkt.haslayer(Dot11ProbeResp):
-        addr = pkt.getlayer(Dot11).addr1
-        target = pkt.getlayer(Dot11ProbeResp).info or ''
-        time_stamp = pkt.getlayer(Dot11ProbeResp).time
-    if addr and target:
+    else:
+        addr = ''
+        target = ''
+    # if pkt.haslayer(Dot11ProbeResp):
+    #     addr = pkt.getlayer(Dot11).addr1
+    #     target = pkt.getlayer(Dot11ProbeResp).info or ''
+    #     time_stamp = pkt.getlayer(Dot11ProbeResp).time
+    if addr:
         manuf = parser.get_manuf(addr) or 'Unknown'
         rssi = -(256-ord(pkt.notdecoded[-4:-3]))
         try:
-            print('Detected Devices: MAC[%s] Manuf[%s] Target[%s] RSSI [%d]' % (addr, manuf, target, rssi))
+            if addr == 'dc:f0:90:97:18:95':
+                print('Detected Devices: MAC[%s] Manuf[%s] Target[%s] RSSI [%d]' % (addr, manuf, target, rssi))
             upload_wifi_info(addr, rssi, int(conf['sensorId']), time_stamp)
             # print('Detected Devices: MAC[%s] Target[%s] RSSI [%d]' % (addr, target, rssi))
         except Exception, err:

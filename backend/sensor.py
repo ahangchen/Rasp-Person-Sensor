@@ -34,7 +34,7 @@ def upload_detection_info(frame, boxes, sensorId):
     for box in boxes:
         detect_json["boxes"].append(box)
 
-    print post_json(svr_conf.urls['upload_detect_info'], detect_json)
+    post_json(svr_conf.urls['upload_detect_info'], detect_json)
     # post image
     t.cleanup()
 
@@ -47,5 +47,4 @@ def upload_wifi_info(mac, rssi, sensorId, time_stamp):
         "macAddress": mac,
         "intensity": rssi
     }
-    print(wifi_json)
-    print(post_form(svr_conf.urls['upload_wifi_info'], wifi_json))
+    post_form(svr_conf.urls['upload_wifi_info'], wifi_json)

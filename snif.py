@@ -27,6 +27,7 @@ def monitorDevice(pkt):
         try:
             if addr == 'dc:f0:90:97:18:95':
                 print('Detected Devices: MAC[%s] Manuf[%s] Target[%s] RSSI [%d]' % (addr, manuf, target, rssi))
+                print('strength:%f' % time_stamp)
             upload_wifi_info(addr, rssi, int(conf['sensorId']), time_stamp)
             # print('Detected Devices: MAC[%s] Target[%s] RSSI [%d]' % (addr, target, rssi))
         except Exception, err:
